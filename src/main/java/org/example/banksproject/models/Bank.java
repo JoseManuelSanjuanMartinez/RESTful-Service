@@ -16,4 +16,19 @@ public class Bank {
 
     public Bank() {
     }
+
+    public Bank(int id, Bank toCopy) {
+        this.id = toCopy.id;
+        this.name = toCopy.name;
+        this.swiftBicCode = toCopy.swiftBicCode;
+        this.web = toCopy.web;
+    }
+
+    /**
+     * GETTERS
+     */
+
+    public int getId() {
+        return id;
+    }
 }
