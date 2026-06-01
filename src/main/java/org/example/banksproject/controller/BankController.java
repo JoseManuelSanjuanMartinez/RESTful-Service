@@ -17,16 +17,16 @@ class BankController {
 
     private final BankRepository bankRepository;
 
-    BankController(BankRepository bankRepository) {
+    public BankController(BankRepository bankRepository) {
         this.bankRepository = bankRepository;
     }
 
     @GetMapping("/")
     public ResponseEntity<Iterable<Bank>> findAll() {return ResponseEntity.ok(bankRepository.findAll());}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Bank> findById(@PathVariable int id) {
-        Optional<Bank> optionalBank = bankRepository.findById(id);
+    @GetMapping("/{bankId}")
+    public ResponseEntity<Bank> findById(@PathVariable int bankId) {
+        Optional<Bank> optionalBank = bankRepository.findById(bankId);
 
         if (optionalBank.isPresent()) {
             return ok(optionalBank.get());
@@ -41,23 +41,23 @@ class BankController {
 
         URI modelLocation = uriBuilder.path("/banks/{id}").buildAndExpand(bank.getId()).toUri();
 
-        return ResponseEntity.ok(bank);
+        return ResponseEntity.created(modelLocation).body(bank);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable int id, @RequestBody Bank body) {
-        Optional<Bank> optionalBank = bankRepository.findById(id);
+    @PutMapping("/{bankId}")
+    public ResponseEntity<Bank> update(@PathVariable int bankId, @RequestBody Bank body) {
+        Optional<Bank> optionalBank = bankRepository.findById(bankId);
         if (optionalBank.isPresent()) {
-            Bank updatedBank = bankRepository.save(new Bank(id, optionalBank.get()));
+            Bank updatedBank = bankRepository.save(new Bank(bankId, optionalBank.get()));
             return ResponseEntity.ok(updatedBank);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
-        Optional<Bank> optionalBank = bankRepository.findById(id);
+    @DeleteMapping("/{bankId}")
+    public ResponseEntity<Void> delete(@PathVariable int bankId) {
+        Optional<Bank> optionalBank = bankRepository.findById(bankId);
         if (optionalBank.isPresent()) {
             bankRepository.delete(optionalBank.get());
             return ResponseEntity.noContent().build();
