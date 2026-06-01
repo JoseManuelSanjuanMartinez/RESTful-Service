@@ -31,4 +31,16 @@ public class Bank {
     public int getId() {
         return id;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSwiftBicCode() {
+        return swiftBicCode;
+    }
+
+    public String getWeb() {
+        return web;
+    }
 }
