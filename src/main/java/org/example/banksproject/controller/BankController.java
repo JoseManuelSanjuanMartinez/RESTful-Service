@@ -46,9 +46,8 @@ class BankController {
 
     @PutMapping("/{bankId}")
     public ResponseEntity<Bank> update(@PathVariable int bankId, @RequestBody Bank body) {
-        Optional<Bank> optionalBank = bankRepository.findById(bankId);
-        if (optionalBank.isPresent()) {
-            Bank updatedBank = bankRepository.save(new Bank(bankId, optionalBank.get()));
+        if (bankRepository.existsById(bankId)) {
+            Bank updatedBank = bankRepository.save(Bank.copyBank(bankId, body));
             return ResponseEntity.ok(updatedBank);
         } else {
             return ResponseEntity.notFound().build();

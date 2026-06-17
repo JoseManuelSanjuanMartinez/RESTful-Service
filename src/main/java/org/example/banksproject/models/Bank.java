@@ -1,7 +1,6 @@
 package org.example.banksproject.models;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.PersistenceCreator;
 
 public class Bank {
 
@@ -10,7 +9,8 @@ public class Bank {
     private String swiftBicCode;
     private String web;
 
-    @PersistenceCreator
+    public Bank(){}
+
     public Bank(int id, String name, String swiftBicCode, String web) {
         this.id = id;
         this.name = name;
@@ -18,11 +18,8 @@ public class Bank {
         this.web = web;
     }
 
-    public Bank(int id, Bank toCopy) {
-        this.id = toCopy.id;
-        this.name = toCopy.name;
-        this.swiftBicCode = toCopy.swiftBicCode;
-        this.web = toCopy.web;
+    public static Bank copyBank(int id, Bank toCopy) {
+        return new Bank(id, toCopy.name, toCopy.swiftBicCode, toCopy.web);
     }
 
     /**
