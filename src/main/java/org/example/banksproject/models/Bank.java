@@ -1,20 +1,21 @@
 package org.example.banksproject.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
 
-@Entity
 public class Bank {
 
-    @Id
-    @GeneratedValue
-    private int id;
+    @Id private int id;
     private String name;
     private String swiftBicCode;
     private String web;
 
-    public Bank() {
+    @PersistenceCreator
+    public Bank(int id, String name, String swiftBicCode, String web) {
+        this.id = id;
+        this.name = name;
+        this.swiftBicCode = swiftBicCode;
+        this.web = web;
     }
 
     public Bank(int id, Bank toCopy) {
