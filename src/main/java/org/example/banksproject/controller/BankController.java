@@ -25,7 +25,7 @@ class BankController {
     public ResponseEntity<Iterable<Bank>> findAll() {return ResponseEntity.ok(bankRepository.findAll());}
 
     @GetMapping("/{bankId}")
-    public ResponseEntity<Bank> findById(@PathVariable int bankId) {
+    public ResponseEntity<Bank> findById(@PathVariable Integer bankId) {
         Optional<Bank> optionalBank = bankRepository.findById(bankId);
 
         if (optionalBank.isPresent()) {
@@ -45,7 +45,7 @@ class BankController {
     }
 
     @PutMapping("/{bankId}")
-    public ResponseEntity<Bank> update(@PathVariable int bankId, @RequestBody Bank body) {
+    public ResponseEntity<Bank> update(@PathVariable Integer bankId, @RequestBody Bank body) {
         if (bankRepository.existsById(bankId)) {
             Bank updatedBank = bankRepository.save(Bank.copyBank(bankId, body));
             return ResponseEntity.ok(updatedBank);
@@ -55,7 +55,7 @@ class BankController {
     }
 
     @DeleteMapping("/{bankId}")
-    public ResponseEntity<Void> delete(@PathVariable int bankId) {
+    public ResponseEntity<Void> delete(@PathVariable Integer bankId) {
         Optional<Bank> optionalBank = bankRepository.findById(bankId);
         if (optionalBank.isPresent()) {
             bankRepository.delete(optionalBank.get());
