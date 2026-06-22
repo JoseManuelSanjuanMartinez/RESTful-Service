@@ -43,16 +43,16 @@ class MortgageController {
 
     @PostMapping("/")
     public ResponseEntity<Mortgage> create(
-            @PathVariable Integer bankId,
-            @RequestBody Mortgage mortgage,
+            @PathVariable int bankId,
+            @RequestBody Mortgage body,
             UriComponentsBuilder uriBuilder)
     {
-        if (bankId.equals(mortgage.getId())) {
-            mortgageRepository.save(mortgage);
+        if (bankId == body.getBankId()) {
+            Mortgage savedMortgage = mortgageRepository.save(body);
             URI modelLocation = uriBuilder.path("/banks/{bankId}/mortgages/{id}")
-                    .buildAndExpand(bankId, mortgage.getId())
+                    .buildAndExpand(bankId, body.getId())
                     .toUri();
-            return ResponseEntity.created(modelLocation).body(mortgage);
+            return ResponseEntity.created(modelLocation).body(savedMortgage);
         } else if (!bankRepository.existsById(bankId)) {
             return ResponseEntity.notFound().build();
         } else {
@@ -79,6 +79,7 @@ class MortgageController {
     public ResponseEntity<?> delete(@PathVariable Integer bankId, @PathVariable Integer mortgageId) {
         Optional<Mortgage> optionalMortgage = mortgageRepository.findByIdAndBankId(mortgageId, bankId);
         if (optionalMortgage.isPresent()) {
+            mortgageRepository.deleteByIdAndBankId(mortgageId, bankId);
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
