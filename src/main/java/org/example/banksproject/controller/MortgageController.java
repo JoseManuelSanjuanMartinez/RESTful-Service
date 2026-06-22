@@ -1,5 +1,6 @@
 package org.example.banksproject.controller;
 
+import org.apache.coyote.Response;
 import org.example.banksproject.models.Mortgage;
 import org.example.banksproject.repositories.BankRepository;
 import org.example.banksproject.repositories.MortgageRepository;
@@ -76,7 +77,7 @@ class MortgageController {
     }
 
     @DeleteMapping("/{mortgageId}")
-    public ResponseEntity<?> delete(@PathVariable Integer bankId, @PathVariable Integer mortgageId) {
+    public ResponseEntity<Void> delete(@PathVariable Integer bankId, @PathVariable Integer mortgageId) {
         Optional<Mortgage> optionalMortgage = mortgageRepository.findByIdAndBankId(mortgageId, bankId);
         if (optionalMortgage.isPresent()) {
             mortgageRepository.deleteByIdAndBankId(mortgageId, bankId);
