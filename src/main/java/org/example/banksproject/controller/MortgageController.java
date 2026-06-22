@@ -24,7 +24,7 @@ class MortgageController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Iterable<Mortgage>> findAll(@PathVariable Integer bankId) {
+    public ResponseEntity<Iterable<Mortgage>> findAll(@PathVariable int bankId) {
         if (bankRepository.existsById(bankId)) {
             return ResponseEntity.ok(mortgageRepository.findByBankId(bankId));
         } else {
@@ -33,7 +33,7 @@ class MortgageController {
     }
 
     @GetMapping("/{mortgageId}")
-    public ResponseEntity<Mortgage> findById(@PathVariable Integer bankId, @PathVariable Integer mortgageId) {
+    public ResponseEntity<Mortgage> findById(@PathVariable int bankId, @PathVariable int mortgageId) {
         Optional<Mortgage> optionalMortgage = mortgageRepository.findByIdAndBankId(mortgageId, bankId);
         if (optionalMortgage.isPresent()) {
             return ResponseEntity.ok(optionalMortgage.get());
@@ -63,8 +63,8 @@ class MortgageController {
 
     @PutMapping("/{mortgageId}")
     public ResponseEntity<Mortgage> update(
-            @PathVariable Integer bankId,
-            @PathVariable Integer mortgageId,
+            @PathVariable int bankId,
+            @PathVariable int mortgageId,
             @RequestBody Mortgage mortgage)
     {
         Optional<Mortgage> optionalMortgage = mortgageRepository.findByIdAndBankId(mortgageId, bankId);
@@ -77,7 +77,7 @@ class MortgageController {
     }
 
     @DeleteMapping("/{mortgageId}")
-    public ResponseEntity<Void> delete(@PathVariable Integer bankId, @PathVariable Integer mortgageId) {
+    public ResponseEntity<Void> delete(@PathVariable int bankId, @PathVariable int mortgageId) {
         Optional<Mortgage> optionalMortgage = mortgageRepository.findByIdAndBankId(mortgageId, bankId);
         if (optionalMortgage.isPresent()) {
             mortgageRepository.deleteByIdAndBankId(mortgageId, bankId);
