@@ -1,0 +1,260 @@
+
+openapi: 3.0.3
+info:
+  title: "API de catálogo de Bancos"
+  version: 1.0.0
+  description: "API REST que permite gestionar un catálogo de bancos, junto con sus hipotecas."
+
+servers:
+  - url: http://localhost:8080
+
+components:
+  schemas:
+    Bank:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "ING Bank"
+        swiftBicCode:
+          type: string
+          example: "INGDESMM"
+        web:
+          type: string
+          example: "ing.es"
+      required:
+        - id
+        - swiftBicCode
+    Mortgage:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        bankId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Hipoteca Naranja"
+        interestRateType:
+          type: string
+          example: "FIJO"
+        description:
+          type: string
+        apr:
+          type: number
+      required:
+        - id
+        - bankId
+        - interestRateType
+        - apr
+
+paths:
+  /banks/:
+    get:
+      summary: "Devuelve los datos de todos los bancos"
+      operationId: "findAllBanks"
+      responses:
+        "200":
+          description: "TODO"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bank"
+    post:
+      summary: "Crea un nuevo banco"
+      operationId: "createBank"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Bank"
+        required: true
+      responses:
+        "201":
+          description: "TODO"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bank"
+  /banks/{bankId}:
+    get:
+      summary: "Devuelve los datos de un banco concreto"
+      operationId: "findBankById"
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "TODO"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bank"
+        "404":
+          description: "TODO"
+    put:
+      summary: "Modifica los datos de un banco concreto"
+      operationId: "updateBank"
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Bank"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bank"
+        "404":
+          description: "TODO"
+    delete:
+      summary: "DELETE banks/{bankId}"
+      operationId: "deleteBank"
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "204":
+          description: "TODO"
+        "404":
+          description: "TODO"
+  /banks/{bankId}/mortgages/:
+    get:
+      summary: "GET banks/{bankId}/mortgages/"
+      operationId: "findAll"
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Mortgage"
+    post:
+      summary: "POST banks/{bankId}/mortgages/"
+      operationId: "create"
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Mortgage"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Mortgage"
+  /banks/{bankId}/mortgages/{mortgageId}:
+    get:
+      summary: "GET banks/{bankId}/mortgages/{mortgageId}"
+      operationId: "findById"
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "mortgageId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Mortgage"
+    put:
+      summary: "PUT banks/{bankId}/mortgages/{mortgageId}"
+      operationId: "update"
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "mortgageId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Mortgage"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Mortgage"
+    delete:
+      summary: "DELETE banks/{bankId}/mortgages/{mortgageId}"
+      operationId: "delete"
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "mortgageId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
