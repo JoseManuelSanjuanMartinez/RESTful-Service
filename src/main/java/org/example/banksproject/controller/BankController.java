@@ -13,7 +13,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/banks")
-class BankController {
+public class BankController {
 
     private final BankRepository bankRepository;
 

@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/banks/{bankId}/mortgages")
-class MortgageController {
+public class MortgageController {
 
     private final MortgageRepository mortgageRepository;
     private final BankRepository bankRepository;
