@@ -52,7 +52,6 @@ components:
         - bankId
         - interestRateType
         - apr
-
 paths:
   /banks/:
     get:
@@ -60,7 +59,7 @@ paths:
       operationId: "findAllBanks"
       responses:
         "200":
-          description: "TODO"
+          description: "Lista de todos los bancos"
           content:
             application/json:
               schema:
@@ -78,7 +77,7 @@ paths:
         required: true
       responses:
         "201":
-          description: "TODO"
+          description: "Nuevo banco creado"
           content:
             application/json:
               schema:
@@ -96,13 +95,13 @@ paths:
             format: "int32"
       responses:
         "200":
-          description: "TODO"
+          description: "Información del banco solicitado"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Bank"
         "404":
-          description: "TODO"
+          description: "Banco no encontrado"
     put:
       summary: "Modifica los datos de un banco concreto"
       operationId: "updateBank"
@@ -121,15 +120,15 @@ paths:
         required: true
       responses:
         "200":
-          description: "OK"
+          description: "Información del banco modificada"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Bank"
         "404":
-          description: "TODO"
+          description: "Banco no encontrado"
     delete:
-      summary: "DELETE banks/{bankId}"
+      summary: "Borra un banco concreto"
       operationId: "deleteBank"
       parameters:
         - name: "bankId"
@@ -140,12 +139,12 @@ paths:
             format: "int32"
       responses:
         "204":
-          description: "TODO"
+          description: "Banco eliminado correctamente"
         "404":
-          description: "TODO"
+          description: "Banco no encontrado"
   /banks/{bankId}/mortgages/:
     get:
-      summary: "GET banks/{bankId}/mortgages/"
+      summary: "Devuelve los datos de todas las hipotecas ofertadas por un banco"
       operationId: "findAll"
       parameters:
         - name: "bankId"
@@ -156,7 +155,7 @@ paths:
             format: "int32"
       responses:
         "200":
-          description: "OK"
+          description: "Lista de hipotecas ofertadas por un banco"
           content:
             application/json:
               schema:
@@ -164,7 +163,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/Mortgage"
     post:
-      summary: "POST banks/{bankId}/mortgages/"
+      summary: "Crea una nueva hipoteca asociada a un banco"
       operationId: "create"
       parameters:
         - name: "bankId"
@@ -181,14 +180,14 @@ paths:
         required: true
       responses:
         "200":
-          description: "OK"
+          description: "Nueva hipoteca creada"
           content:
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/Mortgage"
   /banks/{bankId}/mortgages/{mortgageId}:
     get:
-      summary: "GET banks/{bankId}/mortgages/{mortgageId}"
+      summary: "Devuelve los datos de una hipoteca concreta ofertada por un banco"
       operationId: "findById"
       parameters:
         - name: "bankId"
@@ -205,13 +204,15 @@ paths:
             format: "int32"
       responses:
         "200":
-          description: "OK"
+          description: "Información de una hipoteca ofertada por un banco"
           content:
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/Mortgage"
+        "404":
+          description: "Hipoteca no encontrada"
     put:
-      summary: "PUT banks/{bankId}/mortgages/{mortgageId}"
+      summary: "Modifica los datos de una hipoteca concreta ofertada por un banco"
       operationId: "update"
       parameters:
         - name: "bankId"
@@ -234,13 +235,15 @@ paths:
         required: true
       responses:
         "200":
-          description: "OK"
+          description: "Información de la hipoteca modificada"
           content:
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/Mortgage"
+        "404":
+          description: "Hipoteca no encontrada"
     delete:
-      summary: "DELETE banks/{bankId}/mortgages/{mortgageId}"
+      summary: "Elimina una hipoteca concreta ofertada por un banco"
       operationId: "delete"
       parameters:
         - name: "bankId"
@@ -256,5 +259,40 @@ paths:
             type: "integer"
             format: "int32"
       responses:
-        "200":
-          description: "OK"
+        "204":
+          description: "Hipoteca eliminada correctamente"
+        "404":
+          description: "Hipoteca no encontrada"
+  /banks/{bankId}/mortgages/{mortgageId}/simulate:
+    get:
+      summary: "Simula una hipoteca, calculando la cuota mensual asociada"
+      oprationId: "simulateMortgage"
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "mortgageId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "principal"
+          in: "query"
+          required: true
+          schema:
+            type: "number"
+        - name: "years"
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "202":
+          description: "Cuota mensual calculada"
+        "404":
+          description: "Hipoteca no encontrada"
