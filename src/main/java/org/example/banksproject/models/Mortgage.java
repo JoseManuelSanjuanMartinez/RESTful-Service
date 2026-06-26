@@ -3,6 +3,8 @@ package org.example.banksproject.models;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.Id;
 
+import java.util.Objects;
+
 public class Mortgage {
     @Id private Integer id;
     private Integer bankId;
@@ -45,5 +47,17 @@ public class Mortgage {
 
     public double getApr() {
         return apr;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Mortgage mortgage = (Mortgage) o;
+        return Double.compare(getApr(), mortgage.getApr()) == 0 && Objects.equals(getId(), mortgage.getId()) && Objects.equals(getBankId(), mortgage.getBankId()) && Objects.equals(getName(), mortgage.getName()) && getInterestRateType() == mortgage.getInterestRateType() && Objects.equals(getDescription(), mortgage.getDescription());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getBankId());
     }
 }

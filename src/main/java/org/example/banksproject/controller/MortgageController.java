@@ -87,7 +87,7 @@ public class MortgageController {
             @RequestBody Mortgage mortgage)
     {
         Optional<Bank> optionalBank = bankRepository.findById(bankId);
-        if (optionalBank.isEmpty()) {
+        if (optionalBank.isEmpty() || !mortgageRepository.existsByIdAndBankId(mortgageId, bankId)) {
             return ResponseEntity.notFound().build();
         }
 
