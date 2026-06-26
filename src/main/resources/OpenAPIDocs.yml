@@ -15,7 +15,7 @@ components:
       properties:
         id:
           type: integer
-          example: 1
+          readOnly: true
         name:
           type: string
           example: "ING Bank"
@@ -26,17 +26,18 @@ components:
           type: string
           example: "ing.es"
       required:
-        - id
+        - name
+        - web
         - swiftBicCode
     Mortgage:
       type: object
       properties:
         id:
           type: integer
-          example: 1
+          readOnly: true
         bankId:
           type: integer
-          example: 1
+          readOnly: true
         name:
           type: string
           example: "Hipoteca Naranja"
@@ -47,9 +48,9 @@ components:
           type: string
         apr:
           type: number
+          example: 1.75
       required:
-        - id
-        - bankId
+        - name
         - interestRateType
         - apr
 paths:
@@ -69,6 +70,8 @@ paths:
     post:
       summary: "Crea un nuevo banco"
       operationId: "createBank"
+      security:
+        - ApiKeyAuth: []
       requestBody:
         content:
           application/json:
@@ -105,6 +108,8 @@ paths:
     put:
       summary: "Modifica los datos de un banco concreto"
       operationId: "updateBank"
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: "bankId"
           in: "path"
@@ -130,6 +135,8 @@ paths:
     delete:
       summary: "Borra un banco concreto"
       operationId: "deleteBank"
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: "bankId"
           in: "path"
@@ -165,6 +172,8 @@ paths:
     post:
       summary: "Crea una nueva hipoteca asociada a un banco"
       operationId: "create"
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: "bankId"
           in: "path"
@@ -214,6 +223,8 @@ paths:
     put:
       summary: "Modifica los datos de una hipoteca concreta ofertada por un banco"
       operationId: "update"
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: "bankId"
           in: "path"
@@ -245,6 +256,8 @@ paths:
     delete:
       summary: "Elimina una hipoteca concreta ofertada por un banco"
       operationId: "delete"
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: "bankId"
           in: "path"
@@ -266,7 +279,7 @@ paths:
   /banks/{bankId}/mortgages/{mortgageId}/simulate:
     get:
       summary: "Simula una hipoteca, calculando la cuota mensual asociada"
-      oprationId: "simulateMortgage"
+      operationId: "simulateMortgage"
       parameters:
         - name: "bankId"
           in: "path"

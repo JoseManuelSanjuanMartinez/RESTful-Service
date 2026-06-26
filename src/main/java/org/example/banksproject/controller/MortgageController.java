@@ -49,17 +49,16 @@ public class MortgageController {
             @RequestBody Mortgage body,
             UriComponentsBuilder uriBuilder)
     {
-        if (bankId == body.getBankId()) {
-            Mortgage savedMortgage = mortgageRepository.save(body);
-            URI modelLocation = uriBuilder.path("/banks/{bankId}/mortgages/{id}")
-                    .buildAndExpand(bankId, body.getId())
-                    .toUri();
-            return ResponseEntity.created(modelLocation).body(savedMortgage);
-        } else if (!bankRepository.existsById(bankId)) {
+        if (!bankRepository.existsById(bankId)) {
             return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.badRequest().build();
         }
+
+        Mortgage toSave = new Mortgage(null, bankId, body.getName(), body.getInterestRateType(), body.getDescription(), body.getApr());
+        Mortgage savedMortgage = mortgageRepository.save(toSave);
+        URI modelLocation = uriBuilder.path("/banks/{bankId}/mortgages/{id}")
+                .buildAndExpand(bankId, savedMortgage.getId())
+                .toUri();
+        return ResponseEntity.created(modelLocation).body(savedMortgage);
     }
 
     @PutMapping("/{mortgageId}")
@@ -70,7 +69,9 @@ public class MortgageController {
     {
         Optional<Mortgage> optionalMortgage = mortgageRepository.findByIdAndBankId(mortgageId, bankId);
         if (optionalMortgage.isPresent()) {
-            Mortgage updatedMortgage = mortgageRepository.save(Mortgage.copyMortgage(mortgageId, mortgage));
+            // Build updated mortgage using path bankId to avoid trusting client-provided bankId
+            Mortgage toSave = new Mortgage(mortgageId, bankId, mortgage.getName(), mortgage.getInterestRateType(), mortgage.getDescription(), mortgage.getApr());
+            Mortgage updatedMortgage = mortgageRepository.save(toSave);
             return ResponseEntity.ok(updatedMortgage);
         } else {
             return ResponseEntity.notFound().build();

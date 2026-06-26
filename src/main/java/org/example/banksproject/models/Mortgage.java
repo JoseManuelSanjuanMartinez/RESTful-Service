@@ -4,8 +4,8 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.Id;
 
 public class Mortgage {
-    @Id private int id;
-    private int bankId;
+    @Id private Integer id;
+    private Integer bankId;
     private String name;
     private InterestRateType interestRateType;
     private String description;
@@ -14,7 +14,7 @@ public class Mortgage {
     public Mortgage() {
     }
 
-    public Mortgage(int id, int bankId, String name, InterestRateType interestRateType, String description, double apr) {
+    public Mortgage(Integer id, Integer bankId, String name, InterestRateType interestRateType, String description, double apr) {
         this.id = id;
         this.bankId = bankId;
         this.name = name;
@@ -23,13 +23,13 @@ public class Mortgage {
         this.apr = apr;
     }
 
-    public static Mortgage copyMortgage(int mortgageId, Mortgage toCopy) {
+    public static Mortgage copyMortgage(Integer mortgageId, Mortgage toCopy) {
         return new Mortgage(mortgageId, toCopy.bankId, toCopy.name, toCopy.interestRateType, toCopy.description, toCopy.apr);
     }
 
-    public int getBankId() {return bankId;}
+    public Integer getBankId() {return bankId;}
 
-    public int getId() {return id;}
+    public Integer getId() {return id;}
 
     public String getName() {
         return name;

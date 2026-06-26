@@ -4,21 +4,21 @@ import org.springframework.data.annotation.Id;
 
 public class Bank {
 
-    @Id private int id;
+    @Id private Integer id;
     private String name;
     private String swiftBicCode;
     private String web;
 
     public Bank(){}
 
-    public Bank(int id, String name, String swiftBicCode, String web) {
+    public Bank(Integer id, String name, String swiftBicCode, String web) {
         this.id = id;
         this.name = name;
         this.swiftBicCode = swiftBicCode;
         this.web = web;
     }
 
-    public static Bank copyBank(int id, Bank toCopy) {
+    public static Bank copyBank(Integer id, Bank toCopy) {
         return new Bank(id, toCopy.name, toCopy.swiftBicCode, toCopy.web);
     }
 
@@ -26,7 +26,7 @@ public class Bank {
      * GETTERS
      */
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
