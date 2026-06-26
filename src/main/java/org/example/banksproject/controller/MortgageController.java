@@ -1,9 +1,14 @@
 package org.example.banksproject.controller;
 
+import org.example.banksproject.models.ApiUser;
+import org.example.banksproject.models.Bank;
 import org.example.banksproject.models.Mortgage;
 import org.example.banksproject.repositories.BankRepository;
 import org.example.banksproject.repositories.MortgageRepository;
+import org.example.banksproject.security.ApiKeyAuth;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -22,6 +27,15 @@ public class MortgageController {
     public MortgageController(MortgageRepository mortgageRepository, BankRepository bankRepository) {
         this.mortgageRepository = mortgageRepository;
         this.bankRepository = bankRepository;
+    }
+
+    /**
+     *  Utility Methods
+     */
+
+    private ApiUser getCurrentPrincipal() {
+        ApiKeyAuth auth = (ApiKeyAuth) SecurityContextHolder.getContext().getAuthentication();
+        return auth.getPrincipal();
     }
 
     @GetMapping("/")
@@ -49,8 +63,13 @@ public class MortgageController {
             @RequestBody Mortgage body,
             UriComponentsBuilder uriBuilder)
     {
-        if (!bankRepository.existsById(bankId)) {
+        Optional<Bank> optionalBank = bankRepository.findById(bankId);
+        if (optionalBank.isEmpty()) {
             return ResponseEntity.notFound().build();
+        }
+
+        if (!optionalBank.get().isOwnedBy(getCurrentPrincipal().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         Mortgage toSave = new Mortgage(null, bankId, body.getName(), body.getInterestRateType(), body.getDescription(), body.getApr());
@@ -67,26 +86,33 @@ public class MortgageController {
             @PathVariable int mortgageId,
             @RequestBody Mortgage mortgage)
     {
-        Optional<Mortgage> optionalMortgage = mortgageRepository.findByIdAndBankId(mortgageId, bankId);
-        if (optionalMortgage.isPresent()) {
-            // Build updated mortgage using path bankId to avoid trusting client-provided bankId
-            Mortgage toSave = new Mortgage(mortgageId, bankId, mortgage.getName(), mortgage.getInterestRateType(), mortgage.getDescription(), mortgage.getApr());
-            Mortgage updatedMortgage = mortgageRepository.save(toSave);
-            return ResponseEntity.ok(updatedMortgage);
-        } else {
+        Optional<Bank> optionalBank = bankRepository.findById(bankId);
+        if (optionalBank.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
+        if (!optionalBank.get().isOwnedBy(getCurrentPrincipal().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Mortgage toSave = new Mortgage(mortgageId, bankId, mortgage.getName(), mortgage.getInterestRateType(), mortgage.getDescription(), mortgage.getApr());
+        Mortgage updatedMortgage = mortgageRepository.save(toSave);
+        return ResponseEntity.ok(updatedMortgage);
     }
 
     @DeleteMapping("/{mortgageId}")
     public ResponseEntity<Void> delete(@PathVariable int bankId, @PathVariable int mortgageId) {
-        Optional<Mortgage> optionalMortgage = mortgageRepository.findByIdAndBankId(mortgageId, bankId);
-        if (optionalMortgage.isPresent()) {
-            mortgageRepository.deleteByIdAndBankId(mortgageId, bankId);
-            return ResponseEntity.noContent().build();
-        } else {
+        Optional<Bank> optionalBank = bankRepository.findById(bankId);
+        if (optionalBank.isEmpty() || !mortgageRepository.existsByIdAndBankId(mortgageId, bankId)) {
             return ResponseEntity.notFound().build();
         }
+
+        if (!optionalBank.get().isOwnedBy(getCurrentPrincipal().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        mortgageRepository.deleteByIdAndBankId(mortgageId, bankId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{mortgageId}/simulate")
@@ -97,12 +123,11 @@ public class MortgageController {
             @RequestParam int years)
     {
         Optional<Mortgage> optionalMortgage = mortgageRepository.findByIdAndBankId(mortgageId, bankId);
-        if (optionalMortgage.isPresent()) {
-            Mortgage mortgage = optionalMortgage.get();
-            return ResponseEntity.ok(calculateMonthlyMortgagePayment(principal, years, mortgage));
-        } else {
+        if (optionalMortgage.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+
+        return ResponseEntity.ok(calculateMonthlyMortgagePayment(principal, years, optionalMortgage.get()));
     }
 
     private BigDecimal calculateMonthlyMortgagePayment(double principal, int years, Mortgage mortgage) {

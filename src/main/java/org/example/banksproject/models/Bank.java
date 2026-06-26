@@ -8,18 +8,26 @@ public class Bank {
     private String name;
     private String swiftBicCode;
     private String web;
+    private Integer ownerId;
 
     public Bank(){}
 
-    public Bank(Integer id, String name, String swiftBicCode, String web) {
+    public Bank(Integer id, String name, String swiftBicCode, String web, Integer ownerId) {
         this.id = id;
         this.name = name;
         this.swiftBicCode = swiftBicCode;
         this.web = web;
+        this.ownerId = ownerId;
     }
 
     public static Bank copyBank(Integer id, Bank toCopy) {
-        return new Bank(id, toCopy.name, toCopy.swiftBicCode, toCopy.web);
+        return new Bank(
+                id,
+                toCopy.name,
+                toCopy.swiftBicCode,
+                toCopy.web,
+                toCopy.ownerId
+        );
     }
 
     /**
@@ -40,5 +48,13 @@ public class Bank {
 
     public String getWeb() {
         return web;
+    }
+
+    public boolean isOwnedBy(Integer ownerId) {
+        return ownerId.equals(this.ownerId);
+    }
+
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
     }
 }

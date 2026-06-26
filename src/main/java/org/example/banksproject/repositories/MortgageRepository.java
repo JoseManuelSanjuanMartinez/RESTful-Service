@@ -13,4 +13,6 @@ public interface MortgageRepository extends CrudRepository<Mortgage, Integer> {
     List<Mortgage> findByBankId(int bankId);
 
     void deleteByIdAndBankId(int id, int bankId);
+
+    boolean existsByIdAndBankId(int id, int bankId);
 }
