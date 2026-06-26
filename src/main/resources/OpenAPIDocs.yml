@@ -53,6 +53,11 @@ components:
         - name
         - interestRateType
         - apr
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: ApiKey
 paths:
   /banks/:
     get:
