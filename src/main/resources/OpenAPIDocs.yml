@@ -53,6 +53,31 @@ components:
         - name
         - interestRateType
         - apr
+    MortgageAttachment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        mortgageId:
+          type: integer
+          readOnly: true
+        filename:
+          type: string
+          example: "condiciones_hipoteca.pdf"
+        contentType:
+          type: string
+          example: "application/pdf"
+        size:
+          type: integer
+          example: 245678
+        path:
+          type: string
+          readOnly: true
+      required:
+        - filename
+        - contentType
+        - size
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
@@ -314,3 +339,132 @@ paths:
           description: "Cuota mensual calculada"
         "404":
           description: "Hipoteca no encontrada"
+  /banks/{bankId}/mortgages/{mortgageId}/attachments:
+    post:
+      summary: "Adjunta un PDF a una hipoteca"
+      operationId: "uploadAttachment"
+      security:
+        - ApiKeyAuth: [ ]
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "mortgageId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        "201":
+          description: "PDF adjuntado correctamente"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MortgageAttachment"
+        "404":
+          description: "Hipoteca no encontrada"
+        "400":
+          description: "Archivo inválido"
+
+    get:
+      summary: "Lista los PDFs asociados a una hipoteca"
+      operationId: "listAttachments"
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "mortgageId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "Lista de documentos adjuntos"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MortgageAttachment"
+        "404":
+          description: "Hipoteca no encontrada"
+
+
+  /banks/{bankId}/mortgages/{mortgageId}/attachments/{attachmentId}:
+    get:
+      summary: "Descarga un PDF adjunto"
+      operationId: "downloadAttachment"
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+        - name: "mortgageId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+        - name: "attachmentId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "Archivo PDF"
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: "Documento no encontrado"
+
+    delete:
+      summary: "Elimina un PDF adjunto"
+      operationId: "deleteAttachment"
+      security:
+        - ApiKeyAuth: [ ]
+      parameters:
+        - name: "bankId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+        - name: "mortgageId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+        - name: "attachmentId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "204":
+          description: "PDF eliminado correctamente"
+        "404":
+          description: "Documento no encontrado"

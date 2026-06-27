@@ -29,16 +29,16 @@ public class SecurityConfiguration {
                 .securityMatcher("/**")
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                HttpMethod.GET, "/banks/", "/banks/{bankId}", "/banks/{bankId}/mortgages/", "/banks/{bankId}/mortgages/{mortgageId}"
+                                HttpMethod.GET, "/banks/", "/banks/{bankId}", "/banks/{bankId}/mortgages/", "/banks/{bankId}/mortgages/{mortgageId}", "/banks/{bankId}/mortgages/{mortgageId}/attachments/", "/banks/{bankId}/mortgages/{mortgageId}/attachments/{attachmentId}"
                         ).permitAll()
                         .requestMatchers(
-                                HttpMethod.POST, "/banks/", "/banks/{bankId}/mortgages/"
+                                HttpMethod.POST, "/banks/", "/banks/{bankId}/mortgages/", "/banks/{bankId}/mortgages/{mortgageId}/attachments"
                         ).authenticated()
                         .requestMatchers(
-                                HttpMethod.PUT, "/banks/{bankId}", "/banks/{bankId}/mortgages/{mortgageId}"
+                                HttpMethod.PUT, "/banks/{bankId}", "/banks/{bankId}/mortgages/{mortgageId}", "/banks/{bankId}/mortgages/{mortgageId}/attachments/{attachmentId}"
                         ).authenticated()
                         .requestMatchers(
-                                HttpMethod.DELETE, "/banks/{bankId}", "/banks/{bankId}/mortgages/{mortgageId}"
+                                HttpMethod.DELETE, "/banks/{bankId}", "/banks/{bankId}/mortgages/{mortgageId}", "/banks/{bankId}/mortgages/{mortgageId}/attachments/"
                         ).authenticated()
                         .anyRequest().authenticated()
                 ).addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
