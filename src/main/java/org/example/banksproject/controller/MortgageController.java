@@ -211,11 +211,11 @@ public class MortgageController {
         if (optionalAttachment.isEmpty()) return ResponseEntity.notFound().build();
 
         MortgageAttachment attachment = optionalAttachment.get();
+        mortgageAttachmentRepository.deleteByIdAndMortgageId(attachmentId, mortgageId);
         try {
-            mortgageAttachmentRepository.deleteByIdAndMortgageId(attachmentId, mortgageId);
             fileStorageService.delete(attachment.getPath());
         } catch (java.io.IOException e) {
-            // ignore deletion failures for now
+            return ResponseEntity.internalServerError().build();
         }
         return ResponseEntity.noContent().build();
     }
