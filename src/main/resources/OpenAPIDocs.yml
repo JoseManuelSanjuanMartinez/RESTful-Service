@@ -71,9 +71,6 @@ components:
         size:
           type: integer
           example: 245678
-        path:
-          type: string
-          readOnly: true
       required:
         - filename
         - contentType
@@ -182,7 +179,7 @@ paths:
   /banks/{bankId}/mortgages/:
     get:
       summary: "Devuelve los datos de todas las hipotecas ofertadas por un banco"
-      operationId: "findAll"
+      operationId: "findAllMortgages"
       parameters:
         - name: "bankId"
           in: "path"
@@ -201,7 +198,7 @@ paths:
                   $ref: "#/components/schemas/Mortgage"
     post:
       summary: "Crea una nueva hipoteca asociada a un banco"
-      operationId: "create"
+      operationId: "createMortgage"
       security:
         - ApiKeyAuth: []
       parameters:
@@ -227,7 +224,7 @@ paths:
   /banks/{bankId}/mortgages/{mortgageId}:
     get:
       summary: "Devuelve los datos de una hipoteca concreta ofertada por un banco"
-      operationId: "findById"
+      operationId: "findMortgageById"
       parameters:
         - name: "bankId"
           in: "path"
@@ -252,7 +249,7 @@ paths:
           description: "Hipoteca no encontrada"
     put:
       summary: "Modifica los datos de una hipoteca concreta ofertada por un banco"
-      operationId: "update"
+      operationId: "updateMortgage"
       security:
         - ApiKeyAuth: []
       parameters:
@@ -285,7 +282,7 @@ paths:
           description: "Hipoteca no encontrada"
     delete:
       summary: "Elimina una hipoteca concreta ofertada por un banco"
-      operationId: "delete"
+      operationId: "deleteMortgage"
       security:
         - ApiKeyAuth: []
       parameters:
