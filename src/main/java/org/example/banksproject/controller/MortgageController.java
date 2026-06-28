@@ -1,8 +1,6 @@
 package org.example.banksproject.controller;
 
-import org.example.banksproject.models.ApiUser;
-import org.example.banksproject.models.Bank;
-import org.example.banksproject.models.Mortgage;
+import org.example.banksproject.models.*;
 import org.example.banksproject.repositories.BankRepository;
 import org.example.banksproject.repositories.MortgageRepository;
 import org.example.banksproject.security.ApiKeyAuth;
@@ -16,13 +14,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
 
-import org.example.banksproject.models.MortgageAttachment;
 import org.example.banksproject.repositories.MortgageAttachmentRepository;
 import org.example.banksproject.service.FileStorageService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
@@ -143,7 +141,7 @@ public class MortgageController {
     }
 
     @PostMapping("/{mortgageId}/attachments")
-    public ResponseEntity<MortgageAttachment> uploadAttachment(
+    public ResponseEntity<PublicMortgageAttachment> uploadAttachment(
             @PathVariable int bankId,
             @PathVariable int mortgageId,
             @RequestParam("file") MultipartFile file,
@@ -160,31 +158,35 @@ public class MortgageController {
 
         try {
             FileStorageService.StoredFile stored = fileStorageService.store(file, bankId, mortgageId);
-            MortgageAttachment mortgageAttachmentToSave = new MortgageAttachment(null, mortgageId, stored.filename(), stored.contentType(), stored.size(), stored.path());
-            MortgageAttachment saved = mortgageAttachmentRepository.save(mortgageAttachmentToSave);
+            PrivateMortgageAttachment privateMortgageAttachmentToSave = new PrivateMortgageAttachment(null, mortgageId, stored.filename(), stored.contentType(), stored.size(), stored.path());
+            PrivateMortgageAttachment saved = mortgageAttachmentRepository.save(privateMortgageAttachmentToSave);
             URI location = uriBuilder.path("/banks/{bankId}/mortgages/{mortgageId}/attachments/{id}")
                     .buildAndExpand(bankId, mortgageId, saved.getId())
                     .toUri();
-            return ResponseEntity.created(location).body(saved);
+            return ResponseEntity.created(location).body((PublicMortgageAttachment) saved);
         } catch (IllegalArgumentException | java.io.IOException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @GetMapping("/{mortgageId}/attachments")
-    public ResponseEntity<Iterable<MortgageAttachment>> listAttachments(@PathVariable int bankId, @PathVariable int mortgageId) {
+    public ResponseEntity<Iterable<PublicMortgageAttachment>> listAttachments(@PathVariable int bankId, @PathVariable int mortgageId) {
         if (!mortgageRepository.existsByIdAndBankId(mortgageId, bankId)) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(mortgageAttachmentRepository.findByMortgageId(mortgageId));
+
+        ArrayList<PublicMortgageAttachment> attachments = new ArrayList<>();
+        mortgageAttachmentRepository.findByMortgageId(mortgageId)
+                .forEach(privateMortgageAttachment -> {attachments.add(privateMortgageAttachment);});
+        return ResponseEntity.ok(attachments);
     }
 
     @GetMapping("/{mortgageId}/attachments/{attachmentId}")
     public ResponseEntity<Resource> downloadAttachment(@PathVariable int bankId, @PathVariable int mortgageId, @PathVariable int attachmentId) {
-        Optional<MortgageAttachment> optionalAttachment = mortgageAttachmentRepository.findByIdAndMortgageId(attachmentId, mortgageId);
+        Optional<PrivateMortgageAttachment> optionalAttachment = mortgageAttachmentRepository.findByIdAndMortgageId(attachmentId, mortgageId);
         if (!mortgageRepository.existsByIdAndBankId(mortgageId, bankId) || optionalAttachment.isEmpty()) return ResponseEntity.notFound().build();
 
-        MortgageAttachment attachment = optionalAttachment.get();
+        PrivateMortgageAttachment attachment = optionalAttachment.get();
         try {
             Resource resource = fileStorageService.loadAsResource(attachment.getPath());
             return ResponseEntity.ok()
@@ -207,10 +209,10 @@ public class MortgageController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        Optional<MortgageAttachment> optionalAttachment = mortgageAttachmentRepository.findByIdAndMortgageId(attachmentId, mortgageId);
+        Optional<PrivateMortgageAttachment> optionalAttachment = mortgageAttachmentRepository.findByIdAndMortgageId(attachmentId, mortgageId);
         if (optionalAttachment.isEmpty()) return ResponseEntity.notFound().build();
 
-        MortgageAttachment attachment = optionalAttachment.get();
+        PrivateMortgageAttachment attachment = optionalAttachment.get();
         mortgageAttachmentRepository.deleteByIdAndMortgageId(attachmentId, mortgageId);
         try {
             fileStorageService.delete(attachment.getPath());

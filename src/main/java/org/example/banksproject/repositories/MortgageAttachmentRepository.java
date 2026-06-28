@@ -1,15 +1,15 @@
 package org.example.banksproject.repositories;
 
-import org.example.banksproject.models.MortgageAttachment;
+import org.example.banksproject.models.PrivateMortgageAttachment;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-public interface MortgageAttachmentRepository extends CrudRepository<MortgageAttachment, Integer> {
+public interface MortgageAttachmentRepository extends CrudRepository<PrivateMortgageAttachment, Integer> {
 
-    Iterable<MortgageAttachment> findByMortgageId(Integer mortgageId);
+    Iterable<PrivateMortgageAttachment> findByMortgageId(Integer mortgageId);
 
-    Optional<MortgageAttachment> findByIdAndMortgageId(Integer id, Integer mortgageId);
+    Optional<PrivateMortgageAttachment> findByIdAndMortgageId(Integer id, Integer mortgageId);
 
     boolean existsByIdAndMortgageId(Integer id, Integer mortgageId);
 

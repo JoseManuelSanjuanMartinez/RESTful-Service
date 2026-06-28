@@ -4,7 +4,7 @@ import org.example.banksproject.models.Bank;
 import org.example.banksproject.models.Mortgage;
 import org.example.banksproject.models.ApiUser;
 import org.example.banksproject.models.InterestRateType;
-import org.example.banksproject.models.MortgageAttachment;
+import org.example.banksproject.models.PrivateMortgageAttachment;
 import org.example.banksproject.repositories.ApiUsersRepository;
 import org.example.banksproject.repositories.BankRepository;
 import org.example.banksproject.repositories.MortgageAttachmentRepository;
@@ -16,9 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -103,17 +103,18 @@ public class MortgageControllerAttachmentTests {
         MockMultipartFile file = new MockMultipartFile("file", "contract.pdf", "application/pdf", pdfBytes);
 
         // upload
-        String uploadLocation = mockMvc.perform(multipart("/banks/{bankId}/mortgages/{mortgageId}/attachments", bank.getId(), mortgage.getId())
+        MockHttpServletResponse response = mockMvc.perform(multipart("/banks/{bankId}/mortgages/{mortgageId}/attachments", bank.getId(), mortgage.getId())
                         .file(file)
                         .header("ApiKey", "admin-key"))
                 .andExpect(status().isCreated())
-                .andReturn().getResponse().getHeader("Location");
+                .andReturn().getResponse();
 
-        assertThat(uploadLocation).isNotNull();
+        assertThat(response.getHeader("Location")).isNotNull();
+        System.out.println(response.getContentAsString());
 
         // ensure metadata exists
-        Iterable<MortgageAttachment> attachments = mortgageAttachmentRepository.findByMortgageId(mortgage.getId());
-        MortgageAttachment saved = attachments.iterator().next();
+        Iterable<PrivateMortgageAttachment> attachments = mortgageAttachmentRepository.findByMortgageId(mortgage.getId());
+        PrivateMortgageAttachment saved = attachments.iterator().next();
         assertThat(saved.getFilename()).isEqualTo("contract.pdf");
 
         // download
@@ -150,7 +151,7 @@ public class MortgageControllerAttachmentTests {
                         .header("ApiKey", "admin-key"))
                 .andExpect(status().isCreated());
 
-        MortgageAttachment saved = mortgageAttachmentRepository.findByMortgageId(mortgage.getId()).iterator().next();
+        PrivateMortgageAttachment saved = mortgageAttachmentRepository.findByMortgageId(mortgage.getId()).iterator().next();
 
         // attempt delete as different user
         mockMvc.perform(delete("/banks/{bankId}/mortgages/{mortgageId}/attachments/{attachmentId}", bank.getId(), mortgage.getId(), saved.getId())
