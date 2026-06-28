@@ -5,7 +5,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.Objects;
 
-@Table("MORTGAGE")
+@Table("MORTGAGE_ATTACHMENT")
 public class PublicMortgageAttachment {
     @Id
     private Integer id;
