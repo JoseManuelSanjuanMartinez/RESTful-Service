@@ -1,4 +1,4 @@
-package org.example.banksproject.app;
+package org.example.banksproject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
