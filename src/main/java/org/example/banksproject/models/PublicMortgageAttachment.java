@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Table("MORTGAGE_ATTACHMENT")
 public class PublicMortgageAttachment {
@@ -14,8 +15,7 @@ public class PublicMortgageAttachment {
     private String contentType;
     private long size;
 
-    public PublicMortgageAttachment() {
-    }
+    public PublicMortgageAttachment() {}
 
     public PublicMortgageAttachment(Integer id, Integer mortgageId, String filename, String contentType, long size) {
         this.id = id;

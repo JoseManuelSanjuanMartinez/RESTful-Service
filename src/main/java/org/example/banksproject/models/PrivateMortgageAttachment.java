@@ -1,20 +1,21 @@
 package org.example.banksproject.models;
 
-import org.springframework.data.annotation.Id;
-
 import java.util.Objects;
+import java.util.Optional;
 
 public class PrivateMortgageAttachment extends PublicMortgageAttachment{
 
     private String path;
+    private TypeOfAttachment type;
 
     public PrivateMortgageAttachment() {
         super();
     }
 
-    public PrivateMortgageAttachment(Integer id, Integer mortgageId, String filename, String contentType, long size, String path) {
+    public PrivateMortgageAttachment(Integer id, Integer mortgageId, String filename, String contentType, long size, String path, Optional<TypeOfAttachment> type) {
         super(id, mortgageId, filename, contentType, size);
         this.path = path;
+        this.type = type.orElse(TypeOfAttachment.OTHER);
     }
 
     public String getPath() {
@@ -32,5 +33,9 @@ public class PrivateMortgageAttachment extends PublicMortgageAttachment{
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getPath());
+    }
+
+    public TypeOfAttachment getType() {
+        return type;
     }
 }

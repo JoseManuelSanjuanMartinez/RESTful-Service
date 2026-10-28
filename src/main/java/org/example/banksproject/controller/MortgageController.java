@@ -4,6 +4,8 @@ import org.example.banksproject.models.*;
 import org.example.banksproject.repositories.BankRepository;
 import org.example.banksproject.repositories.MortgageRepository;
 import org.example.banksproject.security.ApiKeyAuth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +29,7 @@ import java.util.Optional;
 @RequestMapping("/banks/{bankId}/mortgages")
 public class MortgageController {
 
+    private static final Logger logger = LoggerFactory.getLogger(MortgageController.class);
     private final MortgageRepository mortgageRepository;
     private final BankRepository bankRepository;
     private final MortgageAttachmentRepository mortgageAttachmentRepository;
@@ -145,6 +148,7 @@ public class MortgageController {
             @PathVariable int bankId,
             @PathVariable int mortgageId,
             @RequestParam("file") MultipartFile file,
+            @RequestParam("attachmentType") Optional<TypeOfAttachment> typeOfAttachment,
             UriComponentsBuilder uriBuilder)
     {
         Optional<Bank> optionalBank = bankRepository.findById(bankId);
@@ -158,7 +162,7 @@ public class MortgageController {
 
         try {
             FileStorageService.StoredFile stored = fileStorageService.store(file, bankId, mortgageId);
-            PrivateMortgageAttachment privateMortgageAttachmentToSave = new PrivateMortgageAttachment(null, mortgageId, stored.filename(), stored.contentType(), stored.size(), stored.path());
+            PrivateMortgageAttachment privateMortgageAttachmentToSave = new PrivateMortgageAttachment(null, mortgageId, stored.filename(), stored.contentType(), stored.size(), stored.path(), typeOfAttachment);
             PrivateMortgageAttachment saved = mortgageAttachmentRepository.save(privateMortgageAttachmentToSave);
             URI location = uriBuilder.path("/banks/{bankId}/mortgages/{mortgageId}/attachments/{id}")
                     .buildAndExpand(bankId, mortgageId, saved.getId())
@@ -170,14 +174,25 @@ public class MortgageController {
     }
 
     @GetMapping("/{mortgageId}/attachments")
-    public ResponseEntity<Iterable<PublicMortgageAttachment>> listAttachments(@PathVariable int bankId, @PathVariable int mortgageId) {
+    public ResponseEntity<Iterable<PublicMortgageAttachment>> listAttachments(
+            @PathVariable int bankId,
+            @PathVariable int mortgageId,
+            @RequestParam Optional<TypeOfAttachment> typeOfAttachment)
+    {
         if (!mortgageRepository.existsByIdAndBankId(mortgageId, bankId)) {
             return ResponseEntity.notFound().build();
         }
 
         ArrayList<PublicMortgageAttachment> attachments = new ArrayList<>();
-        mortgageAttachmentRepository.findByMortgageId(mortgageId)
-                .forEach(privateMortgageAttachment -> {attachments.add(privateMortgageAttachment);});
+        if (typeOfAttachment.isEmpty()) {
+            mortgageAttachmentRepository.findByMortgageId(mortgageId).forEach(attachments::add);
+        } else {
+            mortgageAttachmentRepository.findByMortgageId(mortgageId).forEach(attachment -> {
+                if (attachment.getType().equals(typeOfAttachment)) {
+                    attachments.add(attachment);
+                }
+            });
+        }
         return ResponseEntity.ok(attachments);
     }
 
