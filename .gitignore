@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 /data
 /logs
+/src/main/java/org/example/banksproject/postman
 
 ### STS ###
 .apt_generated
