@@ -4,8 +4,7 @@ import org.example.banksproject.models.*;
 import org.example.banksproject.repositories.BankRepository;
 import org.example.banksproject.repositories.MortgageRepository;
 import org.example.banksproject.security.ApiKeyAuth;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.example.banksproject.service.ai.DocumentAnalysisService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,17 +28,18 @@ import java.util.Optional;
 @RequestMapping("/banks/{bankId}/mortgages")
 public class MortgageController {
 
-    private static final Logger logger = LoggerFactory.getLogger(MortgageController.class);
     private final MortgageRepository mortgageRepository;
     private final BankRepository bankRepository;
     private final MortgageAttachmentRepository mortgageAttachmentRepository;
     private final FileStorageService fileStorageService;
+    private final DocumentAnalysisService documentAnalysisService;
 
-    public MortgageController(MortgageRepository mortgageRepository, BankRepository bankRepository, MortgageAttachmentRepository mortgageAttachmentRepository, FileStorageService fileStorageService) {
+    public MortgageController(MortgageRepository mortgageRepository, BankRepository bankRepository, MortgageAttachmentRepository mortgageAttachmentRepository, FileStorageService fileStorageService, DocumentAnalysisService documentAnalysisService) {
         this.mortgageRepository = mortgageRepository;
         this.bankRepository = bankRepository;
         this.mortgageAttachmentRepository = mortgageAttachmentRepository;
         this.fileStorageService = fileStorageService;
+        this.documentAnalysisService = documentAnalysisService;
     }
 
     /**
@@ -151,6 +151,7 @@ public class MortgageController {
             @RequestParam("attachmentType") Optional<TypeOfAttachment> typeOfAttachment,
             UriComponentsBuilder uriBuilder)
     {
+
         Optional<Bank> optionalBank = bankRepository.findById(bankId);
         if (optionalBank.isEmpty() || !mortgageRepository.existsByIdAndBankId(mortgageId, bankId)) {
             return ResponseEntity.notFound().build();
@@ -167,6 +168,11 @@ public class MortgageController {
             URI location = uriBuilder.path("/banks/{bankId}/mortgages/{mortgageId}/attachments/{id}")
                     .buildAndExpand(bankId, mortgageId, saved.getId())
                     .toUri();
+
+            Optional<Mortgage> mortgage = mortgageRepository.findByIdAndBankId(mortgageId, bankId);
+            if (mortgage.isPresent()) {
+                documentAnalysisService.analyzeMortgageAttachments(mortgage.get());
+            }
             return ResponseEntity.created(location).body((PublicMortgageAttachment) saved);
         } catch (IllegalArgumentException | java.io.IOException e) {
             return ResponseEntity.badRequest().build();

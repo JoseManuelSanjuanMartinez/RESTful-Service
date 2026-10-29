@@ -2,6 +2,9 @@ package org.example.banksproject.models;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class PrivateMortgageAttachment extends PublicMortgageAttachment{
 
@@ -18,10 +21,6 @@ public class PrivateMortgageAttachment extends PublicMortgageAttachment{
         this.type = type.orElse(TypeOfAttachment.OTHER);
     }
 
-    public String getPath() {
-        return path;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -35,7 +34,19 @@ public class PrivateMortgageAttachment extends PublicMortgageAttachment{
         return Objects.hash(super.hashCode(), getPath());
     }
 
+    public String getPath() {
+        return path;
+    }
+
     public TypeOfAttachment getType() {
         return type;
+    }
+
+    public byte[] getFileBytes() {
+        try {
+            return Files.readAllBytes(Paths.get(path));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
